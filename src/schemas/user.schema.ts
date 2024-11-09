@@ -10,7 +10,8 @@ export class UserSuspension {
   @Prop({ type: Date })
   endDate: Date;
 }
-export const UserSuspensionSchema = SchemaFactory.createForClass(UserSuspension);
+export const UserSuspensionSchema =
+  SchemaFactory.createForClass(UserSuspension);
 
 @Schema({ timestamps: true })
 export class User extends Document {

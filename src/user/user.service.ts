@@ -9,6 +9,7 @@ import mongoose, { Model, Types } from 'mongoose';
 import { ReadUserDto } from './dtos/read-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { SuspendSalespersonDto } from './dtos/suspend-salesperson.dto';
+import { UserRoleEnum } from 'src/enums/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -30,6 +31,26 @@ export class UserService {
         email,
         full_name,
         role,
+        status,
+        password: hashedPassword,
+        salesTypes,
+      },
+      { session: dbSession },
+    );
+    return newUser;
+  }
+
+  async createSuperAdminUser(
+    createUserDto: CreateUserDto,
+    dbSession: mongoose.Connection = null,
+  ) {
+    const { email, full_name, password, status, salesTypes } = createUserDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await this.userModel.create(
+      {
+        email,
+        full_name,
+        role: UserRoleEnum.SUPERADMIN,
         status,
         password: hashedPassword,
         salesTypes,
@@ -76,7 +97,6 @@ export class UserService {
       return { status: 'failed', message: 'User tidak ditemukan' };
     }
 
-    // TODO: set rabbitmq to run at specific date to make user.status to false on startDate
     const { startDate, endDate } = suspendDto;
     user.suspension = {
       startDate,

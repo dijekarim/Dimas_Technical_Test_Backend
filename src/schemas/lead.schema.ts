@@ -13,7 +13,8 @@ export class LeadStatusHistory {
   @Prop({ type: Date, default: new Date() })
   updatedAt: Date;
 }
-export const LeadStatusHistorySchema = SchemaFactory.createForClass(LeadStatusHistory);
+export const LeadStatusHistorySchema =
+  SchemaFactory.createForClass(LeadStatusHistory);
 
 @Schema({ timestamps: true })
 export class Lead extends Document {

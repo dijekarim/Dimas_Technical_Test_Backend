@@ -40,6 +40,18 @@ export class UserController {
       .json(this.userService.createUser(createUserDto));
   }
 
+  @Post()
+  @UseGuards(AuthGuard)
+  async createSuperAdminUser(
+    @Req() req,
+    @Body() createUserDto: CreateUserDto,
+    @Res() res,
+  ) {
+    return res
+      .status(HttpStatus.OK)
+      .json(this.userService.createSuperAdminUser(createUserDto));
+  }
+
   @Put(':id')
   async updateUser(
     @Req() req,
