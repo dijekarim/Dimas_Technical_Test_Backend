@@ -95,6 +95,7 @@ export class RabbitmqConsumerService {
     });
 
     try {
+      // Create USER with role CLIENT
       await this.userModel.create(
         {
           email: leadData.email,
@@ -104,6 +105,7 @@ export class RabbitmqConsumerService {
         },
         { session: dbSession },
       );
+      // TODO: SENT EMAIL CREDENTIALS TO USER
       await dbSession.commitTransaction();
     } catch (error) {
       await dbSession.abortTransaction();
