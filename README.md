@@ -26,7 +26,39 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## Refernce
+
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [NestJS API Documentation](https://docs.nestjs.com/api)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [MongoDB](https://www.mongodb.com)
+- [RabbitMQ](https://www.rabbitmq.com)
+- [Redis](https://www.redis.io)
+
+## Project setup with docker
+
+### 1. Make Sure you has docker installed on your local
+
+### 2. Build nestjs-app
+```bash
+$ docker compose build nestjs
+```
+
+### 3. Docker compose up
+```bash
+$ docker compose up -d
+```
+
+### 4. Setup init mongodb replica
+```bash
+$ docker exec -it mongodb1 mongo
+$ rs.initiate()
+$ rs.status()
+```
+
+## Project setup native
+Make sure you has all services like mongodb, rabbitmq and redis
 
 ```bash
 $ npm install
