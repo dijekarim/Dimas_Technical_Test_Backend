@@ -8,6 +8,8 @@ import {
   Res,
   HttpStatus,
   Put,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { LeadService } from './lead.service';
 import { UpdateLeadStatusDto } from './dtos/update-lead-status.dto';
@@ -56,6 +58,27 @@ export class LeadController {
     return res
       .status(HttpStatus.OK)
       .json(this.leadService.updateStatus(req.user, id, updateLeadStatusDto));
+  }
+
+  @Get('my')
+  @UseGuards(AuthGuard)
+  async getLeads(
+    @Req() req,
+    @Res() res,
+    @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    const allowedRoles = [UserRoleEnum.SUPERADMIN, UserRoleEnum.SALESPERSON];
+    if (allowedRoles.indexOf(req.user?.role) === -1) {
+      return res.status(HttpStatus.OK).json({
+        status: 'failed',
+        message: 'Akun Anda tidak diijinkan untuk membuat Leads.',
+      });
+    }
+    return res
+      .status(HttpStatus.OK)
+      .json(this.leadService.getLeads(req.user, search, page, limit));
   }
 
   @Put(':id/assignee')

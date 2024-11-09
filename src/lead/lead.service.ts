@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Schema, Types } from 'mongoose';
+import mongoose, { Model, PaginateModel, Schema, Types } from 'mongoose';
 import { Lead } from 'src/schemas/lead.schema';
 import { UpdateLeadStatusDto } from './dtos/update-lead-status.dto';
 import { CreateLeadDto } from './dtos/create-lead.dto';
@@ -9,19 +9,58 @@ import { LeadStatusEnum } from 'src/enums/leads-status.enum';
 import { UserService } from 'src/user/user.service';
 import { updateLeadAssigneeDto } from './dtos/update-lead-assignee.dto';
 import { LeadHistory } from 'src/schemas/lead-history.schema';
+import { UserRoleEnum } from 'src/enums/user-role.enum';
 
 @Injectable()
 export class LeadService {
   private lastAssignedSalesIndex = 0;
 
   constructor(
-    @InjectModel(Lead.name) private readonly leadModel: Model<Lead>,
+    @InjectModel(Lead.name) private readonly leadModel: PaginateModel<any>,
     @InjectModel(LeadHistory.name)
     private readonly leadHistoryModel: Model<LeadHistory>,
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly rmqProducerService: RabbitmqProducerService,
     private readonly userService: UserService,
   ) {}
+
+  async getLeads(
+    user,
+    search: string = null,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    let queryAssignee = null;
+    if (user?.role === UserRoleEnum.SALESPERSON) {
+      queryAssignee = {
+        assignedSalesperson: user._id?.toString(),
+      };
+    }
+
+    let querySearch = null;
+    if (search) {
+      querySearch = {
+        $or: [
+          { customerName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+        ],
+      };
+    }
+
+    const filter = {
+      ...queryAssignee,
+      ...querySearch,
+    };
+
+    const options = {
+      page,
+      limit,
+      sort: { created_at: -1 },
+    };
+
+    const leads = await this.leadModel.paginate(filter, options);
+    return leads;
+  }
 
   async createLead(user, data: CreateLeadDto) {
     const dbSession = await this.connection.startSession();

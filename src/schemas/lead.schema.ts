@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LeadStatusEnum } from 'src/enums/leads-status.enum';
 import { Document, Types } from 'mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
 @Schema()
 export class LeadStatusHistory {
@@ -49,3 +50,4 @@ export class Lead extends Document {
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);
 LeadSchema.index({ assignedSalesperson: 1 });
+LeadSchema.plugin(mongoosePaginate);
